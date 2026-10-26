@@ -259,82 +259,7 @@ Error generating stack: `+o.message+`
 
 
 <script>
-<script>
-// 修正所有 tag / hyperlink - 準確版 2026-10-26
-(function(){
-  const URL_MAP = {
-    'uniqlo_uk': 'https://www.instagram.com/uniqlo_uk',
-    'sticksnsushi.uk': 'https://www.instagram.com/sticksnsushi.uk',
-    'torinori_leeds': 'https://www.instagram.com/torinori_leeds',
-    'oba.leeds': 'https://www.instagram.com/oba.leeds',
-    'khaogaengthai': 'https://www.facebook.com/khaogaengthai',
-    'singkeefoods': 'https://www.instagram.com/singkeefoods',
-    'tastetheorient': 'https://www.instagram.com/tastetheorient',
-    'singkeefoods.co.uk': 'https://www.singkeefoods.co.uk',
-    'tastetheorientsupermarkets.co.uk': 'https://www.tastetheorientsupermarkets.co.uk',
-    'sticksnsushi.com': 'https://www.sticksnsushi.com',
-    'uniqlo.com/uk': 'https://www.uniqlo.com/uk/en/',
-    'facebook.com/khaogaengthai': 'https://www.facebook.com/khaogaengthai',
-    'oba-leeds.co.uk': 'https://www.oba-leeds.co.uk',
-  };
 
-  function openUrl(url){
-    if(!url) return;
-    window.open(url, '_blank', 'noopener,noreferrer');
-  }
-
-  document.addEventListener('click', function(e){
-    const btn=e.target.closest('button');
-    if(!btn) return;
-    const raw=(btn.textContent||'').trim();
-    const clean=raw.replace(/[◍↗◎]/g,'').trim();
-
-    // Instagram
-    if(raw.includes('@') || raw.includes('◍')){
-      const m=clean.match(/@[\w.]+/);
-      let handle=m ? m[0].replace('@','') : clean.replace('@','');
-      handle=handle.toLowerCase();
-      // Try exact map
-      if(URL_MAP[handle]){ openUrl(URL_MAP[handle]); return; }
-      // Try with @
-      if(URL_MAP['@'+handle]){ openUrl(URL_MAP['@'+handle]); return; }
-      // Fallback instagram
-      if(handle.includes('.')) openUrl('https://www.instagram.com/'+handle);
-      return;
-    }
-
-    // Website
-    if(clean.includes('.com') || clean.includes('.co.uk') || raw.includes('↗')){
-      const domain=clean.toLowerCase();
-      if(URL_MAP[domain]){ openUrl(URL_MAP[domain]); return; }
-      // Search for known domain inside text
-      for(let k in URL_MAP){
-        if(domain.includes(k)){ openUrl(URL_MAP[k]); return; }
-      }
-      // Fallback
-      let url=clean;
-      if(!url.startsWith('http')) url='https://'+url;
-      openUrl(url);
-      return;
-    }
-
-    // Map
-    if(raw.includes('◎') || /briggate|vicar|woodhouse|kirkgate|merrion|alwoodley/i.test(clean)){
-      const article=btn.closest('article');
-      let addr='';
-      if(article){
-        const el=article.querySelector('span.truncate');
-        if(el) addr=el.textContent;
-      }
-      const q=addr || clean+' Leeds';
-      openUrl('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q));
-      return;
-    }
-  }, true);
-
-  console.log('[Leeds Map] Accurate hyperlink fix loaded');
-})();
-</script>
 
 
 <!-- 免責聲明 - 港式防賴版 -->
@@ -357,6 +282,76 @@ Error generating stack: `+o.message+`
     </div>
   </div>
 </div>
+
+
+<script>
+// 終極修復版 - 將 button 變真正可點擊 <a>
+(function(){
+  const URL_MAP = {
+    'uniqlo_uk': 'https://www.instagram.com/uniqlo_uk',
+    'sticksnsushi.uk': 'https://www.instagram.com/sticksnsushi.uk',
+    'torinori_leeds': 'https://www.instagram.com/torinori_leeds',
+    'oba.leeds': 'https://www.instagram.com/oba.leeds',
+    'khaogaengthai': 'https://www.facebook.com/khaogaengthai',
+    'singkeefoods': 'https://www.singkeefoods.co.uk',
+    'tastetheorient': 'https://www.tastetheorientsupermarkets.co.uk',
+    'singkeefoods.co.uk': 'https://www.singkeefoods.co.uk',
+    'tastetheorientsupermarkets.co.uk': 'https://www.tastetheorientsupermarkets.co.uk',
+    'sticksnsushi.com': 'https://www.sticksnsushi.com',
+    'uniqlo.com/uk': 'https://www.uniqlo.com/uk/en/',
+    'facebook.com/khaogaengthai': 'https://www.facebook.com/khaogaengthai',
+    'oba-leeds.co.uk': 'https://www.oba-leeds.co.uk',
+    'instagram.com/torinori_leeds': 'https://www.instagram.com/torinori_leeds',
+  };
+  function resolveUrl(btn){
+    const raw=(btn.textContent||'').trim();
+    const clean=raw.replace(/[◍↗◎]/g,'').trim();
+    const lower=clean.toLowerCase();
+    if(raw.includes('@') || raw.includes('◍')){
+      let m=clean.match(/@[\w.]+/);
+      let handle=m ? m[0].replace('@','').toLowerCase() : lower.replace('@','');
+      if(URL_MAP[handle]) return URL_MAP[handle];
+      return 'https://www.instagram.com/'+handle.replace(/[^a-z0-9._]/g,'');
+    }
+    if(lower.includes('.com') || lower.includes('.co.uk') || raw.includes('↗')){
+      if(URL_MAP[lower]) return URL_MAP[lower];
+      for(let k in URL_MAP){ if(lower.includes(k.toLowerCase())) return URL_MAP[k]; }
+      let url=clean;
+      if(!url.startsWith('http')) url='https://'+url;
+      return url;
+    }
+    // Map
+    const article=btn.closest('article') || btn.parentElement;
+    let addr='';
+    if(article){
+      const el=article.querySelector('span.truncate');
+      if(el) addr=el.textContent.trim();
+    }
+    const q=addr || clean+' Leeds';
+    return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
+  }
+  function fixLinks(){
+    document.querySelectorAll('button').forEach(btn=>{
+      if(btn.dataset.fixed) return;
+      const url=resolveUrl(btn);
+      if(!url) return;
+      const a=document.createElement('a');
+      a.href=url;
+      a.target='_blank';
+      a.rel='noopener noreferrer';
+      a.className=btn.className;
+      a.innerHTML=btn.innerHTML;
+      a.style.cursor='pointer';
+      a.style.textDecoration='none';
+      a.dataset.fixed='1';
+      btn.parentNode.replaceChild(a, btn);
+    });
+  }
+  fixLinks();
+  setInterval(fixLinks, 800);
+  new MutationObserver(fixLinks).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
 
 </body>
 </html>
