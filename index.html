@@ -39,5 +39,224 @@ Error generating stack: `+o.message+`
 </script>
   <script>(function(){function m(a){var h=a.getAttribute("href");if(!h)return;try{var u=new URL(h,document.baseURI);if(((u.protocol==="http:"||u.protocol==="https:")&&u.host!==location.host)||u.protocol==="mailto:"||u.protocol==="tel:"||u.protocol==="sms:"){a.target="_blank";a.rel="noopener noreferrer";}}catch(e){}}function s(){document.querySelectorAll("a[href]").forEach(m);}if(document.readyState!=="loading"){s();}else{document.addEventListener("DOMContentLoaded",s);}document.addEventListener("click",function(e){var a=e.target&&e.target.closest&&e.target.closest("a[href]");if(a){m(a);}},true);})();</script>
   <script type="application/json" data-clippy-inline-media-manifest="1">{"version":1,"slots":[]}</script>
+
+<style>
+#hk-fest{position:fixed; right:18px; top:50%; transform:translateY(-50%); z-index:40; width:210px; font-family: 'Noto Serif TC', serif; }
+#hk-fest .fest-card{background:rgba(255,255,255,0.92); backdrop-filter: blur(12px); border:1px solid rgba(0,0,0,0.08); border-radius:20px; padding:16px; box-shadow:0 8px 30px rgba(0,0,0,0.06);}
+#hk-fest .fest-title{font-size:11px; letter-spacing:0.15em; opacity:0.6; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;}
+#hk-fest .fest-item{display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(0,0,0,0.06);}
+#hk-fest .fest-item:last-child{border:0;}
+#hk-fest .fest-name{font-size:13px; font-weight:700;}
+#hk-fest .fest-sub{font-size:10px; opacity:0.5;}
+#hk-fest .fest-days{font-size:12px; font-weight:700; background:#111; color:#fff; border-radius:999px; padding:3px 8px; min-width:52px; text-align:center;}
+#hk-fest .fest-days.soon{background:#FF1A1A;}
+#hk-fest .fest-days.passed{background:#E5E5E5; color:#888;}
+#hk-fest .fest-item.is-passed{opacity:0.55;}
+@media(max-width:1280px){#hk-fest{position:static; transform:none; width:auto; margin:0 16px 20px; } #hk-fest .fest-card{display:grid; grid-template-columns:1fr 1fr; gap:0 12px;} #hk-fest .fest-title{grid-column:1/-1;} #hk-fest .fest-item{border:0; background:rgba(0,0,0,0.03); border-radius:12px; padding:10px 12px; margin:4px 0;}}
+@media(max-width:640px){#hk-fest .fest-card{grid-template-columns:1fr;}}
+</style>
+<div id="hk-fest">
+  <div class="fest-card">
+    <div class="fest-title"><span>中西節日倒數 • LEEDS</span><span id="fest-today" style="font-size:10px; opacity:0.5;"></span></div>
+    <div id="fest-list"></div>
+  </div>
+</div>
+<script>
+(function(){
+  const festivals=[
+    {name:"萬聖節", en:"Halloween", date:"2026-10-31", emoji:"🎃", next:"2027-10-31"},
+    {name:"聖誕節", en:"Christmas", date:"2026-12-25", emoji:"🎄", next:"2027-12-25"},
+    {name:"新曆新年", en:"New Year", date:"2027-01-01", emoji:"🎆", next:"2028-01-01"},
+    {name:"農曆新年", en:"CNY 馬年", date:"2027-02-06", emoji:"🧧", next:"2028-01-26"},
+  ];
+  function daysDiff(d){
+    const now=new Date(); now.setHours(0,0,0,0);
+    const target=new Date(d+"T00:00:00");
+    const diff=Math.ceil((target-now)/86400000);
+    return diff;
+  }
+  function render(){
+    const list=document.getElementById("fest-list");
+    const todayEl=document.getElementById("fest-today");
+    if(!list) return;
+    const now=new Date();
+    if(todayEl) todayEl.textContent=(now.getMonth()+1)+"/"+now.getDate();
+    let html="";
+    festivals.forEach(f=>{
+      let diff=daysDiff(f.date);
+      let txt, cls="", sub=f.en+" • "+f.date.slice(5).replace("-","/");
+      if(diff<0){
+        // 已過，顯示灰色 + 計明年
+        const nextDiff=daysDiff(f.next);
+        txt="已過";
+        cls="passed";
+        sub=f.en+" 已過 • 明年 "+nextDiff+"日";
+      } else if(diff===0){ txt="就係今日！"; cls="soon"; }
+      else if(diff===1){ txt="聽日！"; cls="soon"; }
+      else if(diff<=7){ txt=diff+"日後"; cls="soon"; }
+      else { txt=diff+"日後"; }
+      html+=`<div class="fest-item ${diff<0?"is-passed":""}"><div><div class="fest-name">${f.emoji} ${f.name}</div><div class="fest-sub">${sub}</div></div><div class="fest-days ${cls}">${txt}</div></div>`;
+    });
+    list.innerHTML=html;
+  }
+  render();
+})();
+</script>
+
+
+<style>
+#gov-banner{position:sticky; top:0; z-index:100; background:#FF1A1A; color:#fff; font-family:'Noto Serif TC',serif; display:none;}
+#gov-banner.show{display:block; animation:slideDown 0.4s ease;}
+#gov-banner .gov-inner{max-width:1280px; margin:0 auto; padding:10px 16px; display:flex; gap:12px; align-items:center; justify-content:space-between;}
+#gov-banner .gov-msg{font-size:13px; font-weight:600; line-height:1.4;}
+#gov-banner .gov-tag{background:#fff; color:#FF1A1A; border-radius:999px; padding:2px 8px; font-size:10px; font-weight:800; letter-spacing:0.05em;}
+#gov-banner .gov-close{cursor:pointer; opacity:0.8; font-size:16px; padding:2px 6px;}
+@keyframes slideDown{from{transform:translateY(-100%);} to{transform:translateY(0);}}
+
+#hk-fest{position:fixed; right:18px; top:52%; transform:translateY(-50%); z-index:40; width:235px; font-family:'Noto Serif TC',serif;}
+#hk-fest .fest-card{background:rgba(255,255,255,0.94); backdrop-filter:blur(14px); border:1px solid rgba(0,0,0,0.08); border-radius:22px; padding:16px; box-shadow:0 10px 36px rgba(0,0,0,0.08);}
+#hk-fest .fest-title{font-size:11px; letter-spacing:0.14em; opacity:0.6; margin-bottom:12px; display:flex; justify-content:space-between;}
+#hk-fest .fest-item{display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid rgba(0,0,0,0.05);}
+#hk-fest .fest-item:last-child{border:0;}
+#hk-fest .fest-name{font-size:13px; font-weight:700; display:flex; gap:4px; align-items:center;}
+#hk-fest .fest-tag{font-size:8px; border-radius:999px; padding:1px 5px; font-weight:700;}
+#hk-fest .tag-uk{background:#00247D; color:#fff;}
+#hk-fest .tag-hk{background:#DE2910; color:#fff;}
+#hk-fest .fest-sub{font-size:10px; opacity:0.5; margin-top:1px;}
+#hk-fest .fest-days{font-size:11px; font-weight:700; background:#111; color:#fff; border-radius:999px; padding:4px 9px; min-width:56px; text-align:center;}
+#hk-fest .fest-days.soon{background:#FF1A1A; animation:pulse 1.5s infinite;}
+#hk-fest .fest-empty{font-size:12px; opacity:0.5; text-align:center; padding:12px 0;}
+@keyframes pulse{0%,100%{transform:scale(1);} 50%{transform:scale(1.05);}}
+@media(max-width:1320px){#hk-fest{position:static; transform:none; width:auto; margin:0 16px 18px;} #hk-fest .fest-card{display:grid; grid-template-columns:1fr 1fr; gap:0 10px;} #hk-fest .fest-title{grid-column:1/-1;} #hk-fest .fest-item{border:0; background:rgba(0,0,0,0.03); border-radius:12px; padding:10px 12px; margin:4px 0;}}
+@media(max-width:640px){#hk-fest .fest-card{grid-template-columns:1fr;}}
+</style>
+
+<div id="gov-banner">
+  <div class="gov-inner">
+    <div style="display:flex; gap:10px; align-items:center;">
+      <span class="gov-tag" id="gov-tag">政府公告</span>
+      <span class="gov-msg" id="gov-msg"></span>
+    </div>
+    <span class="gov-close" onclick="this.parentElement.parentElement.classList.remove('show')">✕</span>
+  </div>
+</div>
+
+<div id="hk-fest">
+  <div class="fest-card">
+    <div class="fest-title"><span id="fest-title-main">中西 + 香港節日倒數 • 110日內</span><span id="fest-today"></span></div>
+    <div id="fest-list"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const festivals=[
+    // 英國本地 - 銀行假 + 國慶相關
+    {name:"萬聖節", en:"Halloween", date:"2026-10-31", emoji:"🎃", type:"uk"},
+    {name:"篝火節", en:"Bonfire Night", date:"2026-11-05", emoji:"🔥", type:"uk"},
+    {name:"聖誕節", en:"Christmas", date:"2026-12-25", emoji:"🎄", type:"uk"},
+    {name:"Boxing Day", en:"Boxing Day", date:"2026-12-26", emoji:"🎁", type:"uk"},
+    {name:"新曆新年", en:"New Year", date:"2027-01-01", emoji:"🎆", type:"uk"},
+    {name:"情人節", en:"Valentine", date:"2027-02-14", emoji:"❤️", type:"uk"},
+    {name:"復活節", en:"Good Friday", date:"2027-03-26", emoji:"✝️", type:"uk"},
+    {name:"復活節", en:"Easter Monday", date:"2027-03-29", emoji:"🐣", type:"uk"},
+    {name:"英王壽辰", en:"King's Birthday (UK National Day)", date:"2027-06-12", emoji:"👑", type:"uk"},
+    {name:"聖喬治日", en:"St George's Day", date:"2027-04-23", emoji:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", type:"uk"},
+    {name:"五一銀行假", en:"Early May Bank Hol", date:"2027-05-03", emoji:"🏦", type:"uk"},
+    {name:"春季銀行假", en:"Spring Bank Hol", date:"2027-05-31", emoji:"🏦", type:"uk"},
+    {name:"夏季銀行假", en:"Summer Bank Hol", date:"2027-08-30", emoji:"☀️", type:"uk"},
+    // 香港重要假期 - 已剔除10月1日國慶
+    {name:"農曆新年", en:"CNY 馬年", date:"2027-02-06", emoji:"🧧", type:"hk"},
+    {name:"清明節", en:"Ching Ming", date:"2027-04-05", emoji:"🪦", type:"hk"},
+    {name:"勞動節", en:"Labour Day", date:"2027-05-01", emoji:"👷", type:"hk"},
+    {name:"佛誕", en:"Buddha Birthday", date:"2027-05-19", emoji:"🙏", type:"hk"},
+    {name:"端午節", en:"Tuen Ng", date:"2027-06-09", emoji:"🐉", type:"hk"},
+    {name:"香港回歸", en:"HKSAR Day", date:"2027-07-01", emoji:"🇭🇰", type:"hk"},
+    {name:"中秋節", en:"Mid-Autumn", date:"2027-09-15", emoji:"🥮", type:"hk"},
+    {name:"重陽節", en:"Chung Yeung", date:"2027-10-18", emoji:"⛰️", type:"hk"},
+    {name:"冬至", en:"Winter Solstice", date:"2026-12-21", emoji:"❄️", type:"hk"},
+  ];
+
+  function daysDiff(d){
+    const now=new Date(); now.setHours(0,0,0,0);
+    const target=new Date(d+"T00:00:00");
+    return Math.ceil((target-now)/86400000);
+  }
+
+  function render(){
+    const list=document.getElementById("fest-list");
+    if(!list) return;
+    const now=new Date();
+    document.getElementById("fest-today").textContent=(now.getMonth()+1)+"/"+now.getDate();
+
+    // 過濾：只顯示 0-110日內，過期唔顯示
+    let upcoming=festivals.map(f=>({...f, diff:daysDiff(f.date)})).filter(f=>f.diff>=0 && f.diff<=110).sort((a,b)=>a.diff-b.diff);
+
+    if(upcoming.length===0){
+      list.innerHTML='<div class="fest-empty">未來110日內暫無重要節日<br><span style="font-size:10px;">放假去邊度玩？</span></div>';
+      return;
+    }
+
+    let html="";
+    upcoming.forEach(f=>{
+      let txt, cls="";
+      if(f.diff===0){ txt="就係今日！"; cls="soon"; }
+      else if(f.diff===1){ txt="聽日！"; cls="soon"; }
+      else if(f.diff<=7){ txt=f.diff+"日後"; cls="soon"; }
+      else { txt=f.diff+"日後"; }
+      const tagCls=f.type==="hk"?"tag-hk":"tag-uk";
+      const tagTxt=f.type==="hk"?"HK":"UK";
+      html+=`<div class="fest-item"><div><div class="fest-name">${f.emoji} ${f.name} <span class="fest-tag ${tagCls}">${tagTxt}</span></div><div class="fest-sub">${f.en} • ${f.date.slice(5).replace("-","/")}</div></div><div class="fest-days ${cls}">${txt}</div></div>`;
+    });
+    list.innerHTML=html;
+    document.getElementById("fest-title-main").textContent=`中西 + 香港節日 • ${upcoming.length}個在110日內`;
+  }
+
+  // 政府公告 Banner 邏輯
+  async function checkGovAlert(){
+    try{
+      // 方法1：試讀同目錄下 gov-alert.json（你上傳到 GitHub 就得）
+      const res=await fetch('/gov-alert.json?v='+Date.now(), {cache:'no-store'});
+      if(res.ok){
+        const data=await res.json();
+        if(data && data.active && data.message){
+          showBanner(data.tag||'政府公告', data.message, data.color);
+          return;
+        }
+      }
+    }catch(e){}
+    // 方法2：本地測試用 localStorage
+    try{
+      const local=localStorage.getItem('gov-alert-test');
+      if(local){
+        const data=JSON.parse(local);
+        if(data.active) showBanner(data.tag, data.message, data.color);
+      }
+    }catch(e){}
+  }
+
+  function showBanner(tag, msg, color){
+    const b=document.getElementById('gov-banner');
+    const t=document.getElementById('gov-tag');
+    const m=document.getElementById('gov-msg');
+    if(!b||!t||!m) return;
+    t.textContent=tag;
+    m.textContent=msg;
+    if(color) b.style.background=color;
+    b.classList.add('show');
+  }
+
+  // 對外暴露，方便你手動爆 Banner 測試
+  window.triggerGovBanner=function(msg, tag='政府公告'){
+    showBanner(tag, msg);
+  };
+
+  render();
+  checkGovAlert();
+  // 每小時 check 一次
+  setInterval(()=>{ render(); checkGovAlert(); }, 3600000);
+})();
+</script>
+
 </body>
 </html>
